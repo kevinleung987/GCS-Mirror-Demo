@@ -1,0 +1,11 @@
+.spacer {
+  flex: 1 1 auto;
+}
+
+.content {
+  font-size: 1.8rem;
+  line-height: 1.618;
+  max-width: 38em;
+  margin: auto;
+  padding: 13px;
+}

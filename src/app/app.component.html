@@ -1,5 +1,19 @@
-<ul>
-  <li class="text" *ngFor="let item of items | async">
-    {{item.id}}
-  </li>
-</ul>
+<mat-toolbar color="primary" class="app-toolbar">
+  <button
+    mat-icon-button
+    class="example-icon"
+    aria-label="Example icon-button with menu icon"
+  >
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span>GCS Mirror Extension Demo</span>
+  <span class="spacer"></span>
+</mat-toolbar>
+<div class="content">
+  <h1>Firestore</h1>
+  <ul>
+    <li class="text" *ngFor="let item of items | async">
+      <h3>{{ item.id }}</h3>
+    </li>
+  </ul>
+</div>
