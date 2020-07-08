@@ -2,8 +2,11 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+import { firebaseConfig } from './firebaseConfig';
+
 export const environment = {
-  production: false
+  production: false,
+  firebase: {...firebaseConfig}
 };
 
 /*
@@ -14,3 +17,4 @@ export const environment = {
  * on performance if an error is thrown.
  */
 // import 'zone.js/dist/zone-error';  // Included with Angular CLI.
+
