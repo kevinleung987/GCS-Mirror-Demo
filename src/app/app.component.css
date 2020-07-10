@@ -3,9 +3,19 @@
 }
 
 .content {
-  font-size: 1.8rem;
+  font-size: 1.8em;
   line-height: 1.618;
-  max-width: 38em;
+  max-width: 60%;
   margin: auto;
   padding: 13px;
+}
+
+.example-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.blob-input {
+  width: 50%;
 }

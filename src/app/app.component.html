@@ -10,10 +10,29 @@
   <span class="spacer"></span>
 </mat-toolbar>
 <div class="content">
-  <h1>Firestore</h1>
-  <ul>
-    <li class="text" *ngFor="let item of items | async">
-      <h3>{{ item.id }}</h3>
-    </li>
-  </ul>
+  <div>
+    <h1>Firestore Mirror</h1>
+    <ul>
+      <li class="text" *ngFor="let item of items | async">
+        <h3>{{ item.id }}</h3>
+      </li>
+    </ul>
+  </div>
+
+  <div>
+    <h1>
+      Upload to Cloud Storage
+    </h1>
+    <form class="upload-form">
+      <mat-form-field class="blob-input">
+        <mat-label>File Path to Upload</mat-label>
+        <input
+          matInput
+          [value]="blobPath"
+          (input)="blobPath = $event.target.value"
+        />
+      </mat-form-field>
+      <button mat-button (click)="uploadBlob()">Upload</button>
+    </form>
+  </div>
 </div>
