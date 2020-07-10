@@ -5,6 +5,7 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgxJsonViewerModule } from 'ngx-json-viewer';
 
 import { environment } from '../environments/environment';
 import { AngularMaterialModule } from './angular-material.module';
@@ -21,6 +22,7 @@ import { AppComponent } from './app.component';
     AngularFireStorageModule,
     BrowserAnimationsModule,
     AngularMaterialModule,
+    NgxJsonViewerModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

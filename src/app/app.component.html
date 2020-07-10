@@ -1,20 +1,15 @@
 <mat-toolbar color="primary" class="app-toolbar">
-  <button
-    mat-icon-button
-    class="example-icon"
-    aria-label="Example icon-button with menu icon"
-  >
-    <mat-icon>menu</mat-icon>
-  </button>
   <span>GCS Mirror Extension Demo</span>
   <span class="spacer"></span>
 </mat-toolbar>
 <div class="content">
   <div>
     <h1>Firestore Mirror</h1>
+    <h3>gcs://</h3>
     <ul>
       <li class="text" *ngFor="let item of items | async">
-        <h3>{{ item.id }}</h3>
+        {{ item.id }}
+        <ngx-json-viewer [json]="item" [expanded]="false"></ngx-json-viewer>
       </li>
     </ul>
   </div>
@@ -23,16 +18,19 @@
     <h1>
       Upload to Cloud Storage
     </h1>
+    <h3>Upload Blob</h3>
     <form class="upload-form">
       <mat-form-field class="blob-input">
-        <mat-label>File Path to Upload</mat-label>
+        <mat-label>Path to Upload</mat-label>
         <input
           matInput
           [value]="blobPath"
           (input)="blobPath = $event.target.value"
         />
       </mat-form-field>
-      <button mat-button (click)="uploadBlob()">Upload</button>
+      <button mat-raised-button color="primary" (click)="uploadBlob()">
+        Upload
+      </button>
     </form>
   </div>
 </div>
