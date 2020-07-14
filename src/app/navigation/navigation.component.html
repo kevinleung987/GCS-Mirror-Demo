@@ -1,0 +1,14 @@
+<table mat-table [dataSource]="prefixes">
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef>Prefixes</th>
+    <td mat-cell *matCellDef="let element">📁{{ element.id }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="lastEvent">
+    <th mat-header-cell *matHeaderCellDef>Last Event</th>
+    <td mat-cell *matCellDef="let element">{{ element.lastEvent }}</td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="['id', 'lastEvent']"></tr>
+  <tr mat-row *matRowDef="let row; columns: ['id', 'lastEvent']"></tr>
+</table>

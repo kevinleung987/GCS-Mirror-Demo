@@ -10,9 +10,11 @@ import { NgxJsonViewerModule } from 'ngx-json-viewer';
 import { environment } from '../environments/environment';
 import { AngularMaterialModule } from './angular-material.module';
 import { AppComponent } from './app.component';
+import { ItemsTableComponent } from './items-table/items-table.component';
+import { NavigationComponent } from './navigation/navigation.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, ItemsTableComponent, NavigationComponent],
   imports: [
     BrowserModule,
     FormsModule,
