@@ -12,6 +12,8 @@ import { AngularMaterialModule } from './angular-material.module';
 import { AppComponent } from './app.component';
 import { ItemsTableComponent } from './items-table/items-table.component';
 import { NavigationComponent } from './navigation/navigation.component';
+import { PathService } from './services/path.service';
+import { ConfigService } from './services/config.service';
 
 @NgModule({
   declarations: [AppComponent, ItemsTableComponent, NavigationComponent],
@@ -26,7 +28,7 @@ import { NavigationComponent } from './navigation/navigation.component';
     AngularMaterialModule,
     NgxJsonViewerModule,
   ],
-  providers: [],
+  providers: [PathService, ConfigService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
