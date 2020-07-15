@@ -23,7 +23,7 @@ export class AppComponent {
   uploadBlob(): void {
     const file = new Uint8Array([0x00, 0x00]);
     console.log(this.blobPath);
-    const ref = this.storage.ref(this.blobPath);
+    const ref = this.storage.ref(this.path + '/' + this.blobPath);
     ref.put(file);
   }
 

@@ -8,7 +8,7 @@ import { ConfigService } from './config.service';
 export class PathService {
   constructor(private config: ConfigService) {}
 
-  getGCSPath(path: string): string {
+  getGCSUrl(path: string): string {
     return `gs://${this.config.bucket}/${path}`;
   }
 

@@ -6,7 +6,7 @@
   <div>
     <h1>Firestore Mirror</h1>
     <h3>Path {{path}}</h3>
-    <h3>GCS Path {{pathService.getGCSPath(path)}}</h3>
+    <h3>GCS Path {{pathService.getGCSUrl(path)}}</h3>
     <h3>Firestore Path {{pathService.getFirestorePath(path)}}</h3>
     <div class="mat-elevation-z8">
       <app-navigation [path]="path"></app-navigation>

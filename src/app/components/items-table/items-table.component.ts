@@ -6,8 +6,9 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { ConfigService } from './../services/config.service';
-import { PathService } from './../services/path.service';
+import { ConfigService } from './../../services/config.service';
+import { PathService } from './../../services/path.service';
+import { ItemDocument } from './../../models/document';
 
 @Component({
   selector: 'app-items-table',
@@ -17,7 +18,7 @@ import { PathService } from './../services/path.service';
 export class ItemsTableComponent implements OnChanges {
   displayedColumns: string[] = ['id', 'size', 'type', 'updated'];
   dataSource: MatTableDataSource<any[]>;
-  items: Observable<any[]>;
+  items: Observable<ItemDocument[]>;
 
   @Input() path: string;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -35,8 +36,10 @@ export class ItemsTableComponent implements OnChanges {
       .valueChanges({
         idField: 'id',
       })
-      .pipe(map((result) => result.filter((doc) => doc.deletedTime == null)));
-    this.items.subscribe(data => console.log(data));
+      .pipe(
+        map((result) => result.filter((doc) => doc.deletedTime == null))
+      ) as Observable<ItemDocument[]>;
+    this.items.subscribe((data) => console.log(data));
   }
 
   formatBytes(bytes, decimals = 2): string {

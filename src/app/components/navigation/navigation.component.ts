@@ -3,8 +3,9 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { ConfigService } from '../services/config.service';
-import { PathService } from './../services/path.service';
+import { ConfigService } from '../../services/config.service';
+import { PathService } from '../../services/path.service';
+import { PrefixDocument } from './../../models/document';
 
 @Component({
   selector: 'app-navigation',
@@ -12,7 +13,7 @@ import { PathService } from './../services/path.service';
   styleUrls: ['./navigation.component.css'],
 })
 export class NavigationComponent implements OnChanges {
-  prefixes: Observable<any[]>;
+  prefixes: Observable<PrefixDocument[]>;
 
   @Input() path: string;
   constructor(
@@ -28,6 +29,8 @@ export class NavigationComponent implements OnChanges {
       .valueChanges({
         idField: 'id',
       })
-      .pipe(map((result) => result.filter((doc) => doc.deletedTime == null)));
+      .pipe(
+        map((result) => result.filter((doc) => doc.deletedTime == null))
+      ) as Observable<PrefixDocument[]>;
   }
 }

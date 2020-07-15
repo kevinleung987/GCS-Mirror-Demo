@@ -10,7 +10,7 @@ export class ConfigService {
   prefixes: string;
   items: string;
   constructor() {
-    // TODO: Configurable
+    // TODO: Configurable?
     this.bucket = firebaseConfig.storageBucket;
     this.firestoreRoot = `gcs-mirror/${this.bucket}`;
     this.prefixes = 'prefixes';
