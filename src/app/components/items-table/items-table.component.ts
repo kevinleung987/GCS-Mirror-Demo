@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, ViewChild, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -15,9 +15,9 @@ import { ItemDocument } from './../../models/document';
   templateUrl: './items-table.component.html',
   styleUrls: ['./items-table.component.css'],
 })
-export class ItemsTableComponent implements OnChanges {
+export class ItemsTableComponent implements OnInit, OnChanges {
   displayedColumns: string[] = ['id', 'size', 'type', 'updated'];
-  dataSource: MatTableDataSource<any[]>;
+  dataSource: MatTableDataSource<ItemDocument> = new MatTableDataSource();
   items: Observable<ItemDocument[]>;
 
   @Input() path: string;
@@ -29,6 +29,23 @@ export class ItemsTableComponent implements OnChanges {
     private pathService: PathService
   ) {}
 
+  ngOnInit(): void {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sortingDataAccessor = (item, property) => {
+      switch (property) {
+        case 'size':
+          return parseInt(item.gcsMetadata.size, 10);
+        case 'type':
+          return item.gcsMetadata.contentType;
+        case 'updated':
+          return new Date(item.gcsMetadata.updated);
+        default:
+          return item[property];
+      }
+    };
+    this.dataSource.sort = this.sort;
+  }
+
   ngOnChanges(): void {
     this.items = this.firestore
       .doc(this.pathService.getFirestorePath(this.path))
@@ -39,7 +56,7 @@ export class ItemsTableComponent implements OnChanges {
       .pipe(
         map((result) => result.filter((doc) => doc.deletedTime == null))
       ) as Observable<ItemDocument[]>;
-    this.items.subscribe((data) => console.log(data));
+    this.items.subscribe((data) => (this.dataSource.data = data));
   }
 
   formatBytes(bytes, decimals = 2): string {
