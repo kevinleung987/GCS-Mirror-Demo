@@ -27,7 +27,11 @@ export class AppComponent {
     ref.put(file);
   }
 
-  setPath(path: string): void {
-    this.path = path;
+  handlePathChange(id: any): void {
+    if (id === '../') {
+      this.path = this.path.split('/').slice(0, -1).join();
+    } else {
+      this.path = this.path + '/' + id;
+    }
   }
 }

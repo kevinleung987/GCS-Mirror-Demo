@@ -1,15 +1,21 @@
 <mat-toolbar color="primary" class="app-toolbar">
   <span>GCS Mirror Extension Demo</span>
   <span class="spacer"></span>
+  <button mat-icon-button>
+    <mat-icon>code</mat-icon>
+  </button>
+  <button mat-icon-button>
+    <mat-icon>settings</mat-icon>
+  </button>
 </mat-toolbar>
 <div class="content">
   <div>
     <h1>Firestore Mirror</h1>
-    <h3>Path {{path}}</h3>
-    <h3>GCS Path {{pathService.getGCSUrl(path)}}</h3>
-    <h3>Firestore Path {{pathService.getFirestorePath(path)}}</h3>
+    <h3><b>Path</b> {{path}}</h3>
+    <h3><b>GCS Path</b> {{pathService.getGCSUrl(path)}}</h3>
+    <h3><b>Firestore Path</b> {{pathService.getFirestorePath(path)}}</h3>
     <div class="mat-elevation-z8">
-      <app-navigation [path]="path"></app-navigation>
+      <app-navigation [path]="path" (pathChange)="handlePathChange($event)"></app-navigation>
       <app-items-table [path]="path"></app-items-table>
     </div>
   </div>
@@ -30,9 +36,6 @@
       </mat-form-field>
       <button mat-raised-button color="primary" (click)="uploadBlob()">
         Upload
-      </button>
-      <button mat-raised-button color="primary" (click)="setPath('a')">
-        Test
       </button>
     </form>
   </div>
