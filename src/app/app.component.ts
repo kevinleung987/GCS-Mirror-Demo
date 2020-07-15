@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import { AngularFireStorage } from '@angular/fire/storage';
+import { MatDialog } from '@angular/material/dialog';
 
-import { ConfigService } from './services/config.service';
+import { SettingsComponent } from './components/settings/settings.component';
 import { PathService } from './services/path.service';
+import { environment } from './../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -14,10 +16,20 @@ export class AppComponent {
   path: string;
   constructor(
     private storage: AngularFireStorage,
-    private config: ConfigService,
-    public pathService: PathService
+    public pathService: PathService,
+    public dialog: MatDialog
   ) {
     this.path = '';
+  }
+
+  openDialog(): void {
+    this.dialog.open(SettingsComponent, {
+      width: '600px',
+    });
+  }
+
+  openSource(): void {
+    window.open(environment.sourceUrl, '_blank');
   }
 
   uploadBlob(): void {
@@ -30,7 +42,7 @@ export class AppComponent {
   handlePathChange(id: string): void {
     // TODO: Turn path into array of strings instead of delimiting with slash
     if (id === '../') {
-      const newPath = this.path.slice(0, -1).split('/').slice(0, -1).join()
+      const newPath = this.path.slice(0, -1).split('/').slice(0, -1).join();
       this.path = newPath.length === 0 ? newPath : newPath + '/';
     } else {
       this.path = this.path + id + '/';

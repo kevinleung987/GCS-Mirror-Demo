@@ -7,3 +7,5 @@ export const firebaseConfig = {
   messagingSenderId: '<your-messaging-sender-id>',
   appId: '<your-app-id>',
 };
+
+export const sourceUrl = '<url of repo [optional]>';
