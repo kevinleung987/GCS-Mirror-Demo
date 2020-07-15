@@ -27,11 +27,13 @@ export class AppComponent {
     ref.put(file);
   }
 
-  handlePathChange(id: any): void {
+  handlePathChange(id: string): void {
+    // TODO: Turn path into array of strings instead of delimiting with slash
     if (id === '../') {
-      this.path = this.path.split('/').slice(0, -1).join();
+      const newPath = this.path.slice(0, -1).split('/').slice(0, -1).join()
+      this.path = newPath.length === 0 ? newPath : newPath + '/';
     } else {
-      this.path = this.path + '/' + id;
+      this.path = this.path + id + '/';
     }
   }
 }

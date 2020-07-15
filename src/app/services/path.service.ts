@@ -16,7 +16,7 @@ export class PathService {
     const parts = path.split('/').filter((a) => a.length > 0);
     let firestorePath = `${this.config.firestoreRoot}/`;
     parts.forEach(
-      (part) => (firestorePath += `${this.config.prefixes}/${part}`)
+      (part) => (firestorePath += `${this.config.prefixes}/${part}/`)
     );
     return firestorePath;
   }

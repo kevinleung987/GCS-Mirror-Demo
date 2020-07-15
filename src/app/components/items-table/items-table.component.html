@@ -1,5 +1,5 @@
 <div>
-  <mat-paginator [pageSizeOptions]="[10, 25, 100]"></mat-paginator>
+  
   <table mat-table [dataSource]="dataSource" matSort>
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Items</th>
@@ -29,5 +29,7 @@
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
   </table>
+  <mat-paginator [pageSizeOptions]="[10, 25, 100]"></mat-paginator>
 </div>
