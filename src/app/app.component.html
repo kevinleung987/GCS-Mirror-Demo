@@ -11,20 +11,23 @@
 <div class="content">
   <div>
     <h1>Firestore Mirror</h1>
-    <h3><b>Path</b> {{path}}</h3>
-    <h3><b>GCS Path</b> {{pathService.getGCSUrl(path)}}</h3>
-    <h3><b>Firestore Path</b> {{pathService.getFirestorePath(path)}}</h3>
+    <div><b>Path</b> {{ path }}</div>
+    <div><b>GCS Path</b> {{ pathService.getGCSUrl(path) }}</div>
+    <div><b>Firestore Path</b> {{ pathService.getFirestorePath(path) }}</div>
     <div class="mat-elevation-z8">
-      <app-navigation [path]="path" (pathChange)="handlePathChange($event)"></app-navigation>
-      <app-items-table [path]="path"></app-items-table>
+      <app-navigation
+        [path]="path"
+        [childRef]="childRef"
+        (pathChange)="handlePathChange($event)"
+      ></app-navigation>
+      <app-items-table [path]="path" [childRef]="childRef"></app-items-table>
     </div>
   </div>
-
   <div>
     <h1>
-      Upload to Cloud Storage
+      Debug: Upload to Cloud Storage
     </h1>
-    <h3>Upload Blob</h3>
+    <h3>Upload 2 Byte Blob</h3>
     <form class="upload-form">
       <mat-form-field class="blob-input">
         <mat-label>Path to Upload</mat-label>

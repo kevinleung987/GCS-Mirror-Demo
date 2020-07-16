@@ -1,9 +1,10 @@
 <div>
-  
   <table mat-table [dataSource]="dataSource" matSort>
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Items</th>
-      <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+      <td mat-cell *matCellDef="let element">
+        {{ childRef === element.hash ? "⭐" : null }}{{ element.id }}
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="size">
@@ -23,13 +24,21 @@
     <ng-container matColumnDef="updated">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Modified</th>
       <td mat-cell *matCellDef="let element">
-        {{ element.gcsMetadata.updated | date:'short' }}
+        {{ element.gcsMetadata.updated | date: "short" }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-icon-button color="primary" (click)="deleteFile(element.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
       </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-
   </table>
   <mat-paginator [pageSizeOptions]="[10, 25, 100]"></mat-paginator>
 </div>

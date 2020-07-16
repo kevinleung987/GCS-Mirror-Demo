@@ -2,7 +2,9 @@
   <table mat-table [dataSource]="dataSource" matSort>
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Prefixes</th>
-      <td mat-cell *matCellDef="let element">📁{{ element.id }}</td>
+      <td mat-cell *matCellDef="let element">
+        📁{{ childRef === element.hash ? "⭐" : null }}{{ element.id }}
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="lastEvent">
@@ -13,7 +15,7 @@
     </ng-container>
 
     <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
       <td mat-cell *matCellDef="let element">
         <button mat-icon-button color="primary" (click)="navigate(element.id)">
           <mat-icon>arrow_forward</mat-icon>

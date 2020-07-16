@@ -1,25 +1,37 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { MatDialog } from '@angular/material/dialog';
+import { Observable, Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 
-import { SettingsComponent } from './components/settings/settings.component';
-import { PathService } from './services/path.service';
 import { environment } from './../environments/environment';
+import { SettingsComponent } from './components/settings/settings.component';
+import { PrefixDocument } from './models/document';
+import { PathService } from './services/path.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   blobPath = '';
   path: string;
+  parentPrefix: Subscription;
+  childRef: string;
+
   constructor(
     private storage: AngularFireStorage,
     public pathService: PathService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private firestore: AngularFirestore
   ) {
     this.path = '';
+  }
+
+  ngOnInit(): void {
+    this.updateChildRef();
   }
 
   openDialog(): void {
@@ -34,7 +46,6 @@ export class AppComponent {
 
   uploadBlob(): void {
     const file = new Uint8Array([0x00, 0x00]);
-    console.log(this.blobPath);
     const ref = this.storage.ref(this.path + '/' + this.blobPath);
     ref.put(file);
   }
@@ -47,5 +58,16 @@ export class AppComponent {
     } else {
       this.path = this.path + id + '/';
     }
+    this.updateChildRef();
+  }
+
+  updateChildRef(): void {
+    if (this.parentPrefix) {
+      this.parentPrefix.unsubscribe();
+    }
+    this.parentPrefix = (this.firestore
+      .doc(this.pathService.getFirestorePath(this.path))
+      .valueChanges() as Observable<PrefixDocument>)
+      .subscribe((data) => (this.childRef = data.childRef));
   }
 }
