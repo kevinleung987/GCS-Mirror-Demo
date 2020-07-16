@@ -1,16 +1,16 @@
-import { Component, Input, OnChanges, ViewChild, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFireStorage } from '@angular/fire/storage';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Observable, Subscription } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import * as md5 from 'blueimp-md5';
+import { Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 
+import { ItemDocument } from './../../models/document';
 import { ConfigService } from './../../services/config.service';
 import { PathService } from './../../services/path.service';
-import { ItemDocument, PrefixDocument } from './../../models/document';
-import * as md5 from 'blueimp-md5';
-import { AngularFireStorage } from '@angular/fire/storage';
 
 @Component({
   selector: 'app-items-table',
@@ -56,7 +56,7 @@ export class ItemsTableComponent implements OnInit, OnChanges {
     }
     this.items = this.firestore
       .doc(this.pathService.getFirestorePath(this.path))
-      .collection(this.config.items)
+      .collection(this.config.items, (ref) => ref)
       .snapshotChanges()
       .pipe(
         map((snapshot) =>
@@ -64,8 +64,14 @@ export class ItemsTableComponent implements OnInit, OnChanges {
             const data = item.payload.doc.data() as ItemDocument;
             const id = item.payload.doc.id;
             const hash = md5(item.payload.doc.ref.path);
+            // console.log(item.type, item.payload.doc.id);
             if (data.deletedTime === null) {
-              result.push({ id, ...data, hash });
+              const obj = { id, ...data, hash };
+              setTimeout(() => {
+                // obj.id = 'test'
+                // console.log(obj);
+              }, 3000);
+              result.push(obj);
             }
             return result;
           }, [])
@@ -86,8 +92,15 @@ export class ItemsTableComponent implements OnInit, OnChanges {
   }
 
   deleteFile(id: string): void {
+    // TODO: Add confirmation before deleting
     console.log(this.path + id);
     const ref = this.storage.ref(this.path + id);
     ref.delete();
+  }
+
+  downloadFile(id: string): void {
+    console.log(this.path + id);
+    const ref = this.storage.ref(this.path + id);
+    ref.getDownloadURL().subscribe(url => window.open(url, '_blank'));
   }
 }
