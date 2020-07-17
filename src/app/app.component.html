@@ -15,12 +15,11 @@
     <div><b>GCS Path</b> {{ pathService.getGCSUrl(path) }}</div>
     <div><b>Firestore Path</b> {{ pathService.getFirestorePath(path) }}</div>
     <div class="mat-elevation-z8">
-      <app-navigation
+      <app-mirror
         [path]="path"
         [childRef]="childRef"
         (pathChange)="handlePathChange($event)"
-      ></app-navigation>
-      <app-items-table [path]="path" [childRef]="childRef"></app-items-table>
+      ></app-mirror>
     </div>
   </div>
   <div>

@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { MatPaginator } from '@angular/material/paginator';
@@ -13,11 +13,11 @@ import { ConfigService } from './../../services/config.service';
 import { PathService } from './../../services/path.service';
 
 @Component({
-  selector: 'app-items-table',
-  templateUrl: './items-table.component.html',
-  styleUrls: ['./items-table.component.css'],
+  selector: 'app-mirror',
+  templateUrl: './mirror.component.html',
+  styleUrls: ['./mirror.component.css'],
 })
-export class ItemsTableComponent implements OnInit, OnChanges {
+export class MirrorComponent implements OnInit, OnChanges {
   displayedColumns: string[] = ['id', 'size', 'type', 'updated', 'actions'];
   dataSource: MatTableDataSource<ItemDocument> = new MatTableDataSource();
   items: Subscription;
@@ -26,6 +26,7 @@ export class ItemsTableComponent implements OnInit, OnChanges {
   @Input() childRef: string;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @Output() pathChange: EventEmitter<string> = new EventEmitter();
   constructor(
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
@@ -102,5 +103,9 @@ export class ItemsTableComponent implements OnInit, OnChanges {
     console.log(this.path + id);
     const ref = this.storage.ref(this.path + id);
     ref.getDownloadURL().subscribe(url => window.open(url, '_blank'));
+  }
+
+  navigate(id: string): void {
+    this.pathChange.emit(id);
   }
 }

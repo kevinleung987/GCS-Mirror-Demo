@@ -10,14 +10,14 @@ import { NgxJsonViewerModule } from 'ngx-json-viewer';
 import { environment } from '../environments/environment';
 import { AngularMaterialModule } from './modules/angular-material.module';
 import { AppComponent } from './app.component';
-import { ItemsTableComponent } from './components/items-table/items-table.component';
+import { MirrorComponent } from './components/mirror/mirror.component';
 import { NavigationComponent } from './components/navigation/navigation.component';
 import { PathService } from './services/path.service';
 import { ConfigService } from './services/config.service';
 import { SettingsComponent } from './components/settings/settings.component';
 
 @NgModule({
-  declarations: [AppComponent, ItemsTableComponent, NavigationComponent, SettingsComponent],
+  declarations: [AppComponent, MirrorComponent, NavigationComponent, SettingsComponent],
   imports: [
     BrowserModule,
     FormsModule,

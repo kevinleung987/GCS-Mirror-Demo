@@ -1,4 +1,15 @@
 <div>
+  <mat-grid-list cols="4" rowHeight="100px">
+    <mat-grid-tile>1</mat-grid-tile>
+    <mat-grid-tile>2</mat-grid-tile>
+    <mat-grid-tile>3</mat-grid-tile>
+    <mat-grid-tile>4</mat-grid-tile>
+  </mat-grid-list>
+  <app-navigation
+        [path]="path"
+        [childRef]="childRef"
+        (pathChange)="navigate($event)"
+      ></app-navigation>
   <table mat-table [dataSource]="dataSource" matSort>
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Items</th>

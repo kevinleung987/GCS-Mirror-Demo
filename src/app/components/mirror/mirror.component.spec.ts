@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ItemsTableComponent } from './items-table.component';
+import { MirrorComponent } from './mirror.component';
 
-describe('ItemsTableComponent', () => {
-  let component: ItemsTableComponent;
-  let fixture: ComponentFixture<ItemsTableComponent>;
+describe('MirrorComponent', () => {
+  let component: MirrorComponent;
+  let fixture: ComponentFixture<MirrorComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ItemsTableComponent ]
+      declarations: [ MirrorComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ItemsTableComponent);
+    fixture = TestBed.createComponent(MirrorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
