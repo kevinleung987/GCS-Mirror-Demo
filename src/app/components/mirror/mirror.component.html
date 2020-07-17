@@ -1,15 +1,53 @@
 <div>
-  <mat-grid-list cols="4" rowHeight="100px">
-    <mat-grid-tile>1</mat-grid-tile>
+  <mat-grid-list cols="3" rowHeight="100px">
+    <mat-grid-tile>
+      <div>
+        <div>
+          <button mat-raised-button color="primary" (click)="fileInput.click()">
+            Choose File
+          </button>
+          <input
+            type="file"
+            multiple="false"
+            (change)="onFileSelected($event.target.files)"
+            #fileInput
+            hidden
+          />
+          <mat-form-field class="example-full-width">
+            <mat-label>GCS File Path</mat-label>
+            <input
+              matInput
+              [value]="filePath"
+              (input)="filePath = $event.target.value"
+            />
+          </mat-form-field>
+          <button
+            mat-raised-button
+            color="primary"
+            [disabled]="filePath.length === 0 || fileChosen == null"
+            (click)="uploadFile()"
+          >
+            Upload
+          </button>
+        </div>
+        <div>File Chosen: {{ fileChosen?.name }}</div>
+        <div [hidden]="uploadProgress == null">
+          <mat-progress-bar
+            mode="determinate"
+            [value]="uploadProgress"
+          ></mat-progress-bar>
+        </div>
+      </div>
+    </mat-grid-tile>
     <mat-grid-tile>2</mat-grid-tile>
     <mat-grid-tile>3</mat-grid-tile>
-    <mat-grid-tile>4</mat-grid-tile>
   </mat-grid-list>
   <app-navigation
-        [path]="path"
-        [childRef]="childRef"
-        (pathChange)="navigate($event)"
-      ></app-navigation>
+    [path]="path"
+    [childRef]="childRef"
+    (pathChange)="navigate($event)"
+  >
+  </app-navigation>
   <table mat-table [dataSource]="dataSource" matSort>
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Items</th>
@@ -42,10 +80,14 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef>Actions</th>
       <td mat-cell *matCellDef="let element">
-        <button mat-icon-button color="accent" (click)="deleteFile(element.id)">
+        <button mat-icon-button color="warn" (click)="deleteFile(element.id)">
           <mat-icon>delete</mat-icon>
         </button>
-        <button mat-icon-button color="primary" (click)="downloadFile((element.id))">
+        <button
+          mat-icon-button
+          color="primary"
+          (click)="downloadFile(element.id)"
+        >
           <mat-icon>cloud_download</mat-icon>
         </button>
       </td>

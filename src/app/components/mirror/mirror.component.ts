@@ -1,4 +1,12 @@
-import { Component, Input, OnChanges, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  ViewChild,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { MatPaginator } from '@angular/material/paginator';
@@ -6,7 +14,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import * as md5 from 'blueimp-md5';
 import { Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, finalize } from 'rxjs/operators';
 
 import { ItemDocument } from './../../models/document';
 import { ConfigService } from './../../services/config.service';
@@ -21,6 +29,10 @@ export class MirrorComponent implements OnInit, OnChanges {
   displayedColumns: string[] = ['id', 'size', 'type', 'updated', 'actions'];
   dataSource: MatTableDataSource<ItemDocument> = new MatTableDataSource();
   items: Subscription;
+
+  fileChosen: File;
+  filePath = '';
+  uploadProgress = null;
 
   @Input() path: string;
   @Input() childRef: string;
@@ -102,10 +114,35 @@ export class MirrorComponent implements OnInit, OnChanges {
   downloadFile(id: string): void {
     console.log(this.path + id);
     const ref = this.storage.ref(this.path + id);
-    ref.getDownloadURL().subscribe(url => window.open(url, '_blank'));
+    ref.getDownloadURL().subscribe((url) => window.open(url, '_blank'));
   }
 
   navigate(id: string): void {
     this.pathChange.emit(id);
+  }
+
+  onFileSelected(file: File[]): void {
+    console.log(file[0]);
+    this.fileChosen = file[0];
+    this.filePath = this.fileChosen.name;
+  }
+
+  uploadFile(): void {
+    const task = this.storage.upload(this.filePath, this.fileChosen);
+    task
+      .percentageChanges()
+      .subscribe((percent) => (this.uploadProgress = percent));
+    task
+      .snapshotChanges()
+      .pipe(
+        finalize(() => {
+          setTimeout(() => {
+            this.uploadProgress = null;
+            this.fileChosen = null;
+            this.filePath = '';
+          }, 1000);
+        })
+      )
+      .subscribe();
   }
 }
