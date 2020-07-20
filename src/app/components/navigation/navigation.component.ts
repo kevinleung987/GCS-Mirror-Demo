@@ -1,23 +1,15 @@
-import {
-  Component,
-  Input,
-  OnChanges,
-  ViewChild,
-  OnInit,
-  Output,
-  EventEmitter,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { Observable, Subscription } from 'rxjs';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import * as md5 from 'blueimp-md5';
+import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { ConfigService } from '../../services/config.service';
 import { PathService } from '../../services/path.service';
 import { PrefixDocument } from './../../models/document';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import * as md5 from 'blueimp-md5';
 
 @Component({
   selector: 'app-navigation',

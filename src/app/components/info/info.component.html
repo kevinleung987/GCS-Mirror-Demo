@@ -1,0 +1,21 @@
+<h1 class="title" mat-dialog-title>Demo Overview</h1>
+<mat-dialog-content>
+  <h2>Navigation</h2>
+  <h3>
+    Any nested subdirectory in the current path is available under the Prefixes
+    table. Any items within the current path are available in the Items table.
+    You can enter any nested subdirectory by clicking the arrow next to the
+    Prefix table entry. The current path relative to the root of the Bucket, the
+    full GCS Path, and the mirrored Firestore Path are always available at the
+    top.
+  </h3>
+  <h2>Files</h2>
+  <h3>
+    You can upload files by pressing the Choose File button at the top to select
+    a file from your system. After a file has been selected, the File Path text
+    input will automatically be filled in, this is the path in GCS relative to
+    the current path that the file will be uploaded to. By default this will be
+    set to just the name of your file. You can download or delete files by
+    clicking their respective buttons under the Actions column.
+  </h3>
+</mat-dialog-content>

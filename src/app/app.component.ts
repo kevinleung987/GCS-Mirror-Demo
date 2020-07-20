@@ -3,9 +3,9 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
 
 import { environment } from './../environments/environment';
+import { InfoComponent } from './components/info/info.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { PrefixDocument } from './models/document';
 import { PathService } from './services/path.service';
@@ -17,7 +17,7 @@ import { PathService } from './services/path.service';
 })
 export class AppComponent implements OnInit {
   blobPath = '';
-  path: string;
+  path = '';
   parentPrefix: Subscription;
   childRef: string;
 
@@ -26,15 +26,19 @@ export class AppComponent implements OnInit {
     public pathService: PathService,
     public dialog: MatDialog,
     private firestore: AngularFirestore
-  ) {
-    this.path = '';
-  }
+  ) {}
 
   ngOnInit(): void {
     this.updateChildRef();
   }
 
-  openDialog(): void {
+  openInfoDialog(): void {
+    this.dialog.open(InfoComponent, {
+      width: '60%',
+    });
+  }
+
+  openSettingsDialog(): void {
     this.dialog.open(SettingsComponent, {
       width: '600px',
     });
@@ -53,7 +57,7 @@ export class AppComponent implements OnInit {
   handlePathChange(id: string): void {
     // TODO: Turn path into array of strings instead of delimiting with slash
     if (id === '../') {
-      const newPath = this.path.slice(0, -1).split('/').slice(0, -1).join();
+      const newPath = this.path.slice(0, -1).split('/').slice(0, -1).join('/');
       this.path = newPath.length === 0 ? newPath : newPath + '/';
     } else {
       this.path = this.path + id + '/';
@@ -67,7 +71,8 @@ export class AppComponent implements OnInit {
     }
     this.parentPrefix = (this.firestore
       .doc(this.pathService.getFirestorePath(this.path))
-      .valueChanges() as Observable<PrefixDocument>)
-      .subscribe((data) => (this.childRef = data.childRef));
+      .valueChanges() as Observable<PrefixDocument>).subscribe(
+      (data) => (this.childRef = data.childRef)
+    );
   }
 }

@@ -1,10 +1,13 @@
 <mat-toolbar color="primary" class="app-toolbar">
   <span>GCS Mirror Extension Demo</span>
   <span class="spacer"></span>
+  <button mat-icon-button (click)="openInfoDialog()">
+    <mat-icon>info</mat-icon>
+  </button>
   <button mat-icon-button (click)="openSource()">
     <mat-icon>code</mat-icon>
   </button>
-  <button mat-icon-button (click)="openDialog()">
+  <button mat-icon-button (click)="openSettingsDialog()">
     <mat-icon>settings</mat-icon>
   </button>
 </mat-toolbar>

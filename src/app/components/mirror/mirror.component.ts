@@ -7,7 +7,7 @@ import {
   Output,
   EventEmitter,
 } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore, QueryFn } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -67,9 +67,13 @@ export class MirrorComponent implements OnInit, OnChanges {
     if (this.items) {
       this.items.unsubscribe();
     }
+    this.updateSubscription();
+  }
+
+  updateSubscription(): void {
     this.items = this.firestore
       .doc(this.pathService.getFirestorePath(this.path))
-      .collection(this.config.items, (ref) => ref)
+      .collection(this.config.items, this.getQueryFn())
       .snapshotChanges()
       .pipe(
         map((snapshot) =>
@@ -93,6 +97,10 @@ export class MirrorComponent implements OnInit, OnChanges {
       .subscribe((data) => (this.dataSource.data = data));
   }
 
+  getQueryFn(): QueryFn {
+    return (ref) => ref;
+  }
+
   formatBytes(bytes, decimals = 2): string {
     if (bytes === 0) {
       return '0 Bytes';
@@ -112,7 +120,6 @@ export class MirrorComponent implements OnInit, OnChanges {
   }
 
   downloadFile(id: string): void {
-    console.log(this.path + id);
     const ref = this.storage.ref(this.path + id);
     ref.getDownloadURL().subscribe((url) => window.open(url, '_blank'));
   }
@@ -122,7 +129,6 @@ export class MirrorComponent implements OnInit, OnChanges {
   }
 
   onFileSelected(file: File[]): void {
-    console.log(file[0]);
     this.fileChosen = file[0];
     this.filePath = this.fileChosen.name;
   }
@@ -138,7 +144,6 @@ export class MirrorComponent implements OnInit, OnChanges {
         finalize(() => {
           setTimeout(() => {
             this.uploadProgress = null;
-            this.fileChosen = null;
             this.filePath = '';
           }, 1000);
         })

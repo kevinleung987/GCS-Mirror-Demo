@@ -15,9 +15,10 @@ import { NavigationComponent } from './components/navigation/navigation.componen
 import { PathService } from './services/path.service';
 import { ConfigService } from './services/config.service';
 import { SettingsComponent } from './components/settings/settings.component';
+import { InfoComponent } from './components/info/info.component';
 
 @NgModule({
-  declarations: [AppComponent, MirrorComponent, NavigationComponent, SettingsComponent],
+  declarations: [AppComponent, MirrorComponent, NavigationComponent, SettingsComponent, InfoComponent],
   imports: [
     BrowserModule,
     FormsModule,
