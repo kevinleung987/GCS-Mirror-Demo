@@ -18,8 +18,6 @@ import { PathService } from './services/path.service';
 export class AppComponent implements OnInit {
   blobPath = '';
   path = '';
-  parentPrefix: Subscription;
-  childRef: string;
 
   constructor(
     private storage: AngularFireStorage,
@@ -28,9 +26,7 @@ export class AppComponent implements OnInit {
     private firestore: AngularFirestore
   ) {}
 
-  ngOnInit(): void {
-    this.updateChildRef();
-  }
+  ngOnInit(): void {}
 
   openInfoDialog(): void {
     this.dialog.open(InfoComponent, {
@@ -62,17 +58,5 @@ export class AppComponent implements OnInit {
     } else {
       this.path = this.path + id + '/';
     }
-    this.updateChildRef();
-  }
-
-  updateChildRef(): void {
-    if (this.parentPrefix) {
-      this.parentPrefix.unsubscribe();
-    }
-    this.parentPrefix = (this.firestore
-      .doc(this.pathService.getFirestorePath(this.path))
-      .valueChanges() as Observable<PrefixDocument>).subscribe(
-      (data) => (this.childRef = data.childRef)
-    );
   }
 }
