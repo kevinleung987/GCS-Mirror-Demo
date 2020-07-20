@@ -7,9 +7,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [],
@@ -25,6 +27,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatDialogModule,
     MatGridListModule,
     MatProgressBarModule,
+    MatSlideToggleModule,
+    MatSelectModule,
   ],
   exports: [
     MatToolbarModule,
@@ -37,6 +41,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatDialogModule,
     MatGridListModule,
     MatProgressBarModule,
+    MatSlideToggleModule,
+    MatSelectModule,
   ],
 })
 export class AngularMaterialModule {}

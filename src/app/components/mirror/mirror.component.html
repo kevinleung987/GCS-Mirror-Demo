@@ -39,12 +39,34 @@
         </div>
       </div>
     </mat-grid-tile>
-    <mat-grid-tile>2nd section</mat-grid-tile>
-    <mat-grid-tile>3rd section</mat-grid-tile>
+    <mat-grid-tile>
+      <mat-slide-toggle
+        [(ngModel)]="options.showTombstones"
+        (change)="updateSubscription()"
+        >Tombstones
+      </mat-slide-toggle>
+      <mat-slide-toggle [(ngModel)]="options.showChildRef">
+        Show Child Ref
+      </mat-slide-toggle>
+      <mat-form-field appearance="fill">
+        <mat-label>Limit</mat-label>
+        <mat-select
+          [(value)]="options.limit"
+          (selectionChange)="updateSubscription()"
+        >
+          <mat-option *ngFor="let limit of limits" [value]="limit.value">
+            {{ limit.viewValue }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </mat-grid-tile>
+    <mat-grid-tile>
+      3rd Section
+    </mat-grid-tile>
   </mat-grid-list>
   <app-navigation
     [path]="path"
-    [childRef]="childRef"
+    [childRef]="options.showChildRef ? childRef : null"
     (pathChange)="navigate($event)"
   >
   </app-navigation>
@@ -52,14 +74,17 @@
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Items</th>
       <td mat-cell *matCellDef="let element">
-        {{ childRef === element.hash ? "⭐" : null }}{{ element.id }}
+        {{ options.showChildRef && childRef === element.hash ? "⭐" : null
+        }}{{ element.id }}
       </td>
     </ng-container>
 
     <ng-container matColumnDef="size">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Size</th>
       <td mat-cell *matCellDef="let element">
-        {{ formatBytes(element.gcsMetadata?.size) }}
+        {{
+          element.deletedTime ? null : formatBytes(element.gcsMetadata?.size)
+        }}
       </td>
     </ng-container>
 
@@ -80,12 +105,18 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef>Actions</th>
       <td mat-cell *matCellDef="let element">
-        <button mat-icon-button color="warn" (click)="deleteFile(element.id)">
+        <button
+          mat-icon-button
+          color="warn"
+          [disabled]="element.deletedTime"
+          (click)="deleteFile(element.id)"
+        >
           <mat-icon>delete</mat-icon>
         </button>
         <button
           mat-icon-button
           color="primary"
+          [disabled]="element.deletedTime"
           (click)="downloadFile(element.id)"
         >
           <mat-icon>cloud_download</mat-icon>

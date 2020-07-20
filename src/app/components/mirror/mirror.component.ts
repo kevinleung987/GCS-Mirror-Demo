@@ -7,7 +7,11 @@ import {
   Output,
   EventEmitter,
 } from '@angular/core';
-import { AngularFirestore, QueryFn } from '@angular/fire/firestore';
+import {
+  AngularFirestore,
+  QueryFn,
+  CollectionReference,
+} from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -27,6 +31,14 @@ import { PathService } from './../../services/path.service';
 })
 export class MirrorComponent implements OnInit, OnChanges {
   displayedColumns: string[] = ['id', 'size', 'type', 'updated', 'actions'];
+  limits = [
+    { value: 100, viewValue: 100 },
+    { value: 50, viewValue: 50 },
+    { value: 25, viewValue: 25 },
+    { value: 10, viewValue: 10 },
+    { value: 5, viewValue: 5 },
+    { value: 1, viewValue: 1 },
+  ];
   dataSource: MatTableDataSource<ItemDocument> = new MatTableDataSource();
   items: Subscription;
   parentPrefix: Subscription;
@@ -39,6 +51,7 @@ export class MirrorComponent implements OnInit, OnChanges {
   options = {
     showTombstones: false,
     showChildRef: true,
+    limit: 100,
   };
 
   @Input() path: string;
@@ -90,8 +103,10 @@ export class MirrorComponent implements OnInit, OnChanges {
             const hash = this.options.showChildRef
               ? md5(item.payload.doc.ref.path)
               : null;
-            // console.log(item.type, item.payload.doc.id);
             const obj = { id, ...data, hash };
+            // console.log(item.type, item.payload.doc.id);
+
+            // TODO: Flag new entries/recent deletions
             // setTimeout(() => {
             //   obj.id = 'test'
             //   console.log(obj);
@@ -105,10 +120,13 @@ export class MirrorComponent implements OnInit, OnChanges {
   }
 
   getQueryFn(): QueryFn {
-    if (!this.options.showTombstones) {
-      return (ref) => ref.where('deletedTime', '==', null);
-    }
-    return (ref) => ref;
+    return (ref) => {
+      let ret: CollectionReference | firebase.firestore.Query = ref;
+      if (!this.options.showTombstones) {
+        ret = ret.where('deletedTime', '==', null);
+      }
+      return ret.limit(this.options.limit);
+    };
   }
 
   updateChildRef(): void {
