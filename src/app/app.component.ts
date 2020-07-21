@@ -45,7 +45,7 @@ export class AppComponent implements OnInit {
   }
 
   uploadBlob(): void {
-    const file = new Uint8Array([0x00, 0x00]);
+    const file = new Uint8Array([0x00]);
     const ref = this.storage.ref(this.path + '/' + this.blobPath);
     ref.put(file);
   }

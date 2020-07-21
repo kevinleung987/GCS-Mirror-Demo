@@ -10,6 +10,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -31,6 +32,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatSlideToggleModule,
     MatSelectModule,
     MatRadioModule,
+    MatSnackBarModule,
   ],
   exports: [
     MatToolbarModule,
@@ -46,6 +48,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatSlideToggleModule,
     MatSelectModule,
     MatRadioModule,
+    MatSnackBarModule,
   ],
 })
 export class AngularMaterialModule {}

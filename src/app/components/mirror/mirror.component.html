@@ -13,13 +13,9 @@
             #fileInput
             hidden
           />
-          <mat-form-field class="example-full-width">
+          <mat-form-field>
             <mat-label>Upload Path</mat-label>
-            <input
-              matInput
-              [value]="filePath"
-              (input)="filePath = $event.target.value"
-            />
+            <input matInput [(ngModel)]="filePath" />
           </mat-form-field>
           <button
             mat-raised-button
@@ -54,7 +50,6 @@
       </div>
     </mat-grid-tile>
     <mat-grid-tile>
-      
       <mat-form-field>
         <mat-label>Limit</mat-label>
         <mat-select
@@ -80,8 +75,6 @@
         <mat-hint>Order the results from Firestore</mat-hint>
       </mat-form-field>
       <mat-radio-group
-        aria-labelledby="example-radio-group-label"
-        class="example-radio-group"
         [(ngModel)]="options.order"
         (change)="updateSubscription()"
       >
@@ -98,6 +91,48 @@
           </div>
         </div>
       </mat-radio-group>
+      <button mat-raised-button color="primary" (click)="addFilter()">
+        Add Filter
+      </button>
+    </mat-grid-tile>
+  </mat-grid-list>
+  <mat-grid-list
+    cols="1"
+    rowHeight="60px"
+    *ngFor="let filter of filters; let i = index"
+  >
+    <mat-grid-tile>
+      <mat-form-field>
+        <mat-label>Field</mat-label>
+        <mat-select [(value)]="filter.field">
+          <mat-option *ngFor="let field of queryableFields" [value]="field[0]">
+            {{ field[1] }}
+          </mat-option>
+        </mat-select>
+        <mat-hint>Order the results from Firestore</mat-hint>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Operator</mat-label>
+        <mat-select [(value)]="filter.operator">
+          <mat-option *ngFor="let operator of operators" [value]="operator[0]">
+            {{ operator[1] }}
+          </mat-option>
+        </mat-select>
+        <mat-hint>Order the results from Firestore</mat-hint>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Upload Path</mat-label>
+        <input matInput [(ngModel)]="filter.value" />
+      </mat-form-field>
+      <div>
+        Result: {{ filter.field }} {{ filter.operator }} {{ filter.value }}
+      </div>
+      <button mat-raised-button color="warn" (click)="filters.splice(i, 1)">
+        Remove
+      </button>
+      <button mat-raised-button color="primary" (click)="updateSubscription()">
+        Apply
+      </button>
     </mat-grid-tile>
   </mat-grid-list>
   <app-navigation

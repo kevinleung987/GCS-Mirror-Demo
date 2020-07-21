@@ -20,10 +20,17 @@ import * as md5 from 'blueimp-md5';
 import { Observable, Subscription } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 
-import { queryableFields } from './../../constants';
+import { queryableFields, operatorOptions } from './../../constants';
 import { ItemDocument, PrefixDocument } from './../../models/document';
 import { ConfigService } from './../../services/config.service';
 import { PathService } from './../../services/path.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+interface Filter {
+  field: string;
+  operator: firebase.firestore.WhereFilterOp;
+  value: any;
+}
 
 @Component({
   selector: 'app-mirror',
@@ -41,6 +48,7 @@ export class MirrorComponent implements OnInit, OnChanges {
     { value: 1, viewValue: 1 },
   ];
   queryableFields = [[null, 'None'], ...Object.entries(queryableFields)];
+  operators = [[null, 'None'], ...Object.entries(operatorOptions)];
 
   dataSource: MatTableDataSource<ItemDocument> = new MatTableDataSource();
   items: Subscription;
@@ -57,8 +65,10 @@ export class MirrorComponent implements OnInit, OnChanges {
     showChildRef: true,
     limit: 100,
     orderBy: this.queryableFields[0][0],
+    filterBy: this.queryableFields[0][0],
     order: 'asc' as firebase.firestore.OrderByDirection,
   };
+  filters: Filter[] = [];
 
   @Input() path: string;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -68,7 +78,8 @@ export class MirrorComponent implements OnInit, OnChanges {
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
     private config: ConfigService,
-    private pathService: PathService
+    private pathService: PathService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -123,10 +134,29 @@ export class MirrorComponent implements OnInit, OnChanges {
           }, [])
         )
       )
-      .subscribe((data) => {
-        this.fullData = data;
-        this.updateData();
-      });
+      .subscribe(
+        (data) => {
+          this.fullData = data;
+          this.updateData();
+        },
+        (error) => {
+          if (error.code === 'failed-precondition') {
+            const parts = error.toString().split(' ');
+            const url = parts[parts.length - 1];
+            if (url.includes('https://')) {
+              return this.snackBar
+                .open(
+                  'This query requires an index. Click here to create it:',
+                  'Open',
+                  { duration: 5000 }
+                )
+                .onAction()
+                .subscribe(() => window.open(url, '_blank'));
+            }
+          }
+          this.snackBar.open(error.toString(), null, { duration: 5000 });
+        }
+      );
   }
 
   updateData(): void {
@@ -144,8 +174,25 @@ export class MirrorComponent implements OnInit, OnChanges {
           this.options.order
         );
       }
+      this.filters.forEach((filter) => {
+        if (this.isValidFilter(filter)) {
+          ret = ret.where(
+            'gcsMetadata.' + filter.field,
+            filter.operator,
+            filter.value
+          );
+        }
+        console.log(filter);
+      });
       return ret.limit(this.options.limit);
     };
+  }
+
+  isValidFilter(filter: Filter): boolean {
+    if (filter.field == null || filter.operator == null) {
+      return false;
+    }
+    return true;
   }
 
   updateChildRef(): void {
@@ -206,5 +253,9 @@ export class MirrorComponent implements OnInit, OnChanges {
         })
       )
       .subscribe();
+  }
+
+  addFilter(): void {
+    this.filters.push({ field: null, operator: null, value: null });
   }
 }
