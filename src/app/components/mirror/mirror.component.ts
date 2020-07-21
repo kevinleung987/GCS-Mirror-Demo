@@ -1,25 +1,26 @@
 import {
   Component,
+  EventEmitter,
   Input,
   OnChanges,
   OnInit,
-  ViewChild,
   Output,
-  EventEmitter,
+  ViewChild,
 } from '@angular/core';
 import {
   AngularFirestore,
-  QueryFn,
   CollectionReference,
+  QueryFn,
 } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import * as md5 from 'blueimp-md5';
-import { Subscription, Observable } from 'rxjs';
-import { map, finalize } from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
+import { finalize, map } from 'rxjs/operators';
 
+import { queryableFields } from './../../constants';
 import { ItemDocument, PrefixDocument } from './../../models/document';
 import { ConfigService } from './../../services/config.service';
 import { PathService } from './../../services/path.service';
@@ -39,8 +40,11 @@ export class MirrorComponent implements OnInit, OnChanges {
     { value: 5, viewValue: 5 },
     { value: 1, viewValue: 1 },
   ];
+  queryableFields = [[null, 'None'], ...Object.entries(queryableFields)];
+
   dataSource: MatTableDataSource<ItemDocument> = new MatTableDataSource();
   items: Subscription;
+  fullData: ItemDocument[];
   parentPrefix: Subscription;
   childRef: string;
 
@@ -52,6 +56,8 @@ export class MirrorComponent implements OnInit, OnChanges {
     showTombstones: false,
     showChildRef: true,
     limit: 100,
+    orderBy: this.queryableFields[0][0],
+    order: 'asc' as firebase.firestore.OrderByDirection,
   };
 
   @Input() path: string;
@@ -91,6 +97,7 @@ export class MirrorComponent implements OnInit, OnChanges {
     if (this.items) {
       this.items.unsubscribe();
     }
+    this.dataSource.data = [];
     this.items = this.firestore
       .doc(this.pathService.getFirestorePath(this.path))
       .collection(this.config.items, this.getQueryFn())
@@ -116,14 +123,26 @@ export class MirrorComponent implements OnInit, OnChanges {
           }, [])
         )
       )
-      .subscribe((data) => (this.dataSource.data = data));
+      .subscribe((data) => {
+        this.fullData = data;
+        this.updateData();
+      });
+  }
+
+  updateData(): void {
+    this.dataSource.data = this.fullData.filter((i) =>
+      this.options.showTombstones ? true : i.deletedTime == null
+    );
   }
 
   getQueryFn(): QueryFn {
     return (ref) => {
       let ret: CollectionReference | firebase.firestore.Query = ref;
-      if (!this.options.showTombstones) {
-        ret = ret.where('deletedTime', '==', null);
+      if (this.options.orderBy != null) {
+        ret = ret.orderBy(
+          'gcsMetadata.' + this.options.orderBy,
+          this.options.order
+        );
       }
       return ret.limit(this.options.limit);
     };
@@ -153,7 +172,6 @@ export class MirrorComponent implements OnInit, OnChanges {
 
   deleteFile(id: string): void {
     // TODO: Add confirmation before deleting
-    console.log(this.path + id);
     const ref = this.storage.ref(this.path + id);
     ref.delete();
   }

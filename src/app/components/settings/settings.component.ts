@@ -17,8 +17,7 @@ export class SettingsComponent implements OnInit {
   }
 
   handleSave(): void {
-    Object.keys(this.settings).forEach((key) => {
-      const value = this.settings[key];
+    Object.entries(this.settings).forEach(([key, value]) => {
       this.config.setKey({ key, value });
     });
     location.reload();

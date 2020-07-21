@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  ViewChild,
+  SimpleChanges,
+} from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -38,31 +47,34 @@ export class NavigationComponent implements OnInit, OnChanges {
     this.dataSource.sort = this.sort;
   }
 
-  ngOnChanges(): void {
-    if (this.prefixes) {
-      this.prefixes.unsubscribe();
-    }
-    this.prefixes = this.firestore
-      .doc(this.pathService.getFirestorePath(this.path))
-      .collection(this.config.prefixes)
-      .snapshotChanges()
-      .pipe(
-        map((snapshot) =>
-          snapshot.reduce(
-            (result: any[], item) => {
-              const data = item.payload.doc.data() as PrefixDocument;
-              const id = item.payload.doc.id;
-              const hash = md5(item.payload.doc.ref.path);
-              if (data.deletedTime === null) {
-                result.push({ id, ...data, hash });
-              }
-              return result;
-            },
-            this.path.length === 0 ? [] : [{ id: '../' }]
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.path) {
+      if (this.prefixes) {
+        this.prefixes.unsubscribe();
+      }
+      this.dataSource.data = [];
+      this.prefixes = this.firestore
+        .doc(this.pathService.getFirestorePath(this.path))
+        .collection(this.config.prefixes)
+        .snapshotChanges()
+        .pipe(
+          map((snapshot) =>
+            snapshot.reduce(
+              (result: any[], item) => {
+                const data = item.payload.doc.data() as PrefixDocument;
+                const id = item.payload.doc.id;
+                const hash = md5(item.payload.doc.ref.path);
+                if (data.deletedTime === null) {
+                  result.push({ id, ...data, hash });
+                }
+                return result;
+              },
+              this.path.length === 0 ? [] : [{ id: '../' }]
+            )
           )
         )
-      )
-      .subscribe((data) => (this.dataSource.data = data));
+        .subscribe((data) => (this.dataSource.data = data));
+    }
   }
 
   navigate(id: string): void {

@@ -1,5 +1,5 @@
 <div>
-  <mat-grid-list cols="3" rowHeight="100px">
+  <mat-grid-list cols="2" rowHeight="100px">
     <mat-grid-tile>
       <div>
         <div>
@@ -38,17 +38,24 @@
           ></mat-progress-bar>
         </div>
       </div>
+      <div>
+        <div>
+          <mat-slide-toggle
+            [(ngModel)]="options.showTombstones"
+            (change)="updateData()"
+            >Tombstones
+          </mat-slide-toggle>
+        </div>
+        <div>
+          <mat-slide-toggle [(ngModel)]="options.showChildRef">
+            Show Child Ref
+          </mat-slide-toggle>
+        </div>
+      </div>
     </mat-grid-tile>
     <mat-grid-tile>
-      <mat-slide-toggle
-        [(ngModel)]="options.showTombstones"
-        (change)="updateSubscription()"
-        >Tombstones
-      </mat-slide-toggle>
-      <mat-slide-toggle [(ngModel)]="options.showChildRef">
-        Show Child Ref
-      </mat-slide-toggle>
-      <mat-form-field appearance="fill">
+      
+      <mat-form-field>
         <mat-label>Limit</mat-label>
         <mat-select
           [(value)]="options.limit"
@@ -58,10 +65,39 @@
             {{ limit.viewValue }}
           </mat-option>
         </mat-select>
+        <mat-hint>Limit the number of results from Firestore</mat-hint>
       </mat-form-field>
-    </mat-grid-tile>
-    <mat-grid-tile>
-      3rd Section
+      <mat-form-field>
+        <mat-label>Order By</mat-label>
+        <mat-select
+          [(value)]="options.orderBy"
+          (selectionChange)="updateSubscription()"
+        >
+          <mat-option *ngFor="let field of queryableFields" [value]="field[0]">
+            {{ field[1] }}
+          </mat-option>
+        </mat-select>
+        <mat-hint>Order the results from Firestore</mat-hint>
+      </mat-form-field>
+      <mat-radio-group
+        aria-labelledby="example-radio-group-label"
+        class="example-radio-group"
+        [(ngModel)]="options.order"
+        (change)="updateSubscription()"
+      >
+        <div>
+          <div>
+            <mat-radio-button value="asc" [disabled]="!options.orderBy">
+              Ascending
+            </mat-radio-button>
+          </div>
+          <div>
+            <mat-radio-button value="desc" [disabled]="!options.orderBy">
+              Descending
+            </mat-radio-button>
+          </div>
+        </div>
+      </mat-radio-group>
     </mat-grid-tile>
   </mat-grid-list>
   <app-navigation
