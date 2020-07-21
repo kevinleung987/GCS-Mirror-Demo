@@ -69,6 +69,7 @@ export class MirrorComponent implements OnInit, OnChanges {
     order: 'asc' as firebase.firestore.OrderByDirection,
   };
   filters: Filter[] = [];
+  filtersDirty = false;
 
   @Input() path: string;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
@@ -148,13 +149,13 @@ export class MirrorComponent implements OnInit, OnChanges {
                 .open(
                   'This query requires an index. Click here to create it:',
                   'Open',
-                  { duration: 5000 }
+                  { duration: 10000 }
                 )
                 .onAction()
                 .subscribe(() => window.open(url, '_blank'));
             }
           }
-          this.snackBar.open(error.toString(), null, { duration: 5000 });
+          this.snackBar.open(error.toString(), null, { duration: 10000 });
         }
       );
   }
@@ -176,11 +177,15 @@ export class MirrorComponent implements OnInit, OnChanges {
       }
       this.filters.forEach((filter) => {
         if (this.isValidFilter(filter)) {
-          ret = ret.where(
-            'gcsMetadata.' + filter.field,
-            filter.operator,
-            filter.value
-          );
+          try {
+            ret = ret.where(
+              'gcsMetadata.' + filter.field,
+              filter.operator,
+              filter.value
+            );
+          } catch (e) {
+            this.snackBar.open(e.toString(), null, { duration: 10000 });
+          }
         }
         console.log(filter);
       });
@@ -257,5 +262,11 @@ export class MirrorComponent implements OnInit, OnChanges {
 
   addFilter(): void {
     this.filters.push({ field: null, operator: null, value: null });
+  }
+
+  checkDirty(index: number): void {
+    if (this.isValidFilter(this.filters[index])) {
+      this.filtersDirty = true;
+    }
   }
 }

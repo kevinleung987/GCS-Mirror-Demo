@@ -1,5 +1,5 @@
 <div>
-  <mat-grid-list cols="2" rowHeight="100px">
+  <mat-grid-list cols="1" rowHeight="100px">
     <mat-grid-tile>
       <div>
         <div>
@@ -48,13 +48,11 @@
           </mat-slide-toggle>
         </div>
       </div>
-    </mat-grid-tile>
-    <mat-grid-tile>
       <mat-form-field>
         <mat-label>Limit</mat-label>
         <mat-select
           [(value)]="options.limit"
-          (selectionChange)="updateSubscription()"
+          (selectionChange)="filtersDirty = true"
         >
           <mat-option *ngFor="let limit of limits" [value]="limit.value">
             {{ limit.viewValue }}
@@ -66,7 +64,7 @@
         <mat-label>Order By</mat-label>
         <mat-select
           [(value)]="options.orderBy"
-          (selectionChange)="updateSubscription()"
+          (selectionChange)="filtersDirty = true"
         >
           <mat-option *ngFor="let field of queryableFields" [value]="field[0]">
             {{ field[1] }}
@@ -76,7 +74,7 @@
       </mat-form-field>
       <mat-radio-group
         [(ngModel)]="options.order"
-        (change)="updateSubscription()"
+        (change)="filtersDirty = true;"
       >
         <div>
           <div>
@@ -94,6 +92,14 @@
       <button mat-raised-button color="primary" (click)="addFilter()">
         Add Filter
       </button>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="updateSubscription(); filtersDirty = false"
+        [disabled]="!filtersDirty"
+      >
+        Apply Changes
+      </button>
     </mat-grid-tile>
   </mat-grid-list>
   <mat-grid-list
@@ -104,7 +110,7 @@
     <mat-grid-tile>
       <mat-form-field>
         <mat-label>Field</mat-label>
-        <mat-select [(value)]="filter.field">
+        <mat-select [(value)]="filter.field" (valueChange)="checkDirty(i)">
           <mat-option *ngFor="let field of queryableFields" [value]="field[0]">
             {{ field[1] }}
           </mat-option>
@@ -113,7 +119,7 @@
       </mat-form-field>
       <mat-form-field>
         <mat-label>Operator</mat-label>
-        <mat-select [(value)]="filter.operator">
+        <mat-select [(value)]="filter.operator" (valueChange)="checkDirty(i)">
           <mat-option *ngFor="let operator of operators" [value]="operator[0]">
             {{ operator[1] }}
           </mat-option>
@@ -121,17 +127,23 @@
         <mat-hint>Order the results from Firestore</mat-hint>
       </mat-form-field>
       <mat-form-field>
-        <mat-label>Upload Path</mat-label>
-        <input matInput [(ngModel)]="filter.value" />
+        <mat-label>Value</mat-label>
+        <input matInput [(ngModel)]="filter.value" (input)="checkDirty(i)"/>
       </mat-form-field>
       <div>
-        Result: {{ filter.field }} {{ filter.operator }} {{ filter.value }}
+        Result: {{ filter.field }} {{ filter.operator }}
+        {{ filter.value | json }}
       </div>
-      <button mat-raised-button color="warn" (click)="filters.splice(i, 1)">
+      <div>Valid: {{ isValidFilter(filters[i]) ? "✔️" : "❌" }}</div>
+      <button
+        mat-raised-button
+        color="warn"
+        (click)="
+          checkDirty(i);
+          filters.splice(i, 1)
+        "
+      >
         Remove
-      </button>
-      <button mat-raised-button color="primary" (click)="updateSubscription()">
-        Apply
       </button>
     </mat-grid-tile>
   </mat-grid-list>
@@ -198,5 +210,4 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
-  <mat-paginator [pageSizeOptions]="[10, 25, 100]"></mat-paginator>
 </div>

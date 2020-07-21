@@ -25,11 +25,11 @@ export const metadataFields = {
 };
 
 export const operatorOptions = {
-  '<': 'Less Than',
-  '<=': 'Less Than or Equal To',
-  '==': 'Equal To',
-  '>': 'Greater Than',
-  '>=': 'Greater Than or Equal To',
+  '<': '(<) Less Than',
+  '<=': '(<=) Less Than or Equal To',
+  '==': '(==) Equal To',
+  '>': '(>) Greater Than',
+  '>=': '(>=) Greater Than or Equal To',
   'array-contains': 'Array Contains',
   'array-contains-any': 'Array Contains Any',
   in: 'In',
