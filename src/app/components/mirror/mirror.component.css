@@ -6,8 +6,8 @@ tr.mat-header-row {
   height: 32px;
 }
 
-mat-grid-tile * {
-  margin-right: 16px;
+.grid-item {
+  margin-right: 1em;
 }
 
 .new-entry {

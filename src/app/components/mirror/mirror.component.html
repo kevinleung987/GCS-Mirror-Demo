@@ -1,7 +1,7 @@
 <div>
   <mat-grid-list cols="1" rowHeight="100px">
     <mat-grid-tile>
-      <div>
+      <div class="grid-item">
         <div>
           <button mat-raised-button color="primary" (click)="fileInput.click()">
             Choose File
@@ -34,7 +34,7 @@
           ></mat-progress-bar>
         </div>
       </div>
-      <div>
+      <div class="grid-item">
         <div>
           <mat-slide-toggle
             [(ngModel)]="options.showTombstones"
@@ -48,58 +48,72 @@
           </mat-slide-toggle>
         </div>
       </div>
-      <mat-form-field>
-        <mat-label>Limit</mat-label>
-        <mat-select
-          [(value)]="options.limit"
-          (selectionChange)="filtersDirty = true"
+      <div class="grid-item">
+        <mat-form-field>
+          <mat-label>Limit</mat-label>
+          <mat-select
+            [(value)]="options.limit"
+            (selectionChange)="filtersDirty = true"
+          >
+            <mat-option *ngFor="let limit of limits" [value]="limit.value">
+              {{ limit.viewValue }}
+            </mat-option>
+          </mat-select>
+          <mat-hint>Limit the number of results from Firestore</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-item">
+        <mat-form-field>
+          <mat-label>Order By</mat-label>
+          <mat-select
+            [(value)]="options.orderBy"
+            (selectionChange)="filtersDirty = true"
+          >
+            <mat-option
+              *ngFor="let field of queryableFields"
+              [value]="field[0]"
+            >
+              {{ field[1] }}
+            </mat-option>
+          </mat-select>
+          <mat-hint>Order the results from Firestore</mat-hint>
+        </mat-form-field>
+      </div>
+      <div class="grid-item">
+        <mat-radio-group
+          [(ngModel)]="options.order"
+          (change)="filtersDirty = true"
         >
-          <mat-option *ngFor="let limit of limits" [value]="limit.value">
-            {{ limit.viewValue }}
-          </mat-option>
-        </mat-select>
-        <mat-hint>Limit the number of results from Firestore</mat-hint>
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Order By</mat-label>
-        <mat-select
-          [(value)]="options.orderBy"
-          (selectionChange)="filtersDirty = true"
+          <div>
+            <div>
+              <mat-radio-button value="asc" [disabled]="!options.orderBy">
+                Ascending
+              </mat-radio-button>
+            </div>
+            <div>
+              <mat-radio-button value="desc" [disabled]="!options.orderBy">
+                Descending
+              </mat-radio-button>
+            </div>
+          </div>
+        </mat-radio-group>
+      </div>
+      <div class="grid-item">
+        <button mat-raised-button color="primary" (click)="addFilter()">
+          Add Filter
+        </button>
+      </div>
+      <div class="grid-item">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="updateSubscription(); filtersDirty = false"
+          [disabled]="!filtersDirty"
         >
-          <mat-option *ngFor="let field of queryableFields" [value]="field[0]">
-            {{ field[1] }}
-          </mat-option>
-        </mat-select>
-        <mat-hint>Order the results from Firestore</mat-hint>
-      </mat-form-field>
-      <mat-radio-group
-        [(ngModel)]="options.order"
-        (change)="filtersDirty = true"
-      >
-        <div>
-          <div>
-            <mat-radio-button value="asc" [disabled]="!options.orderBy">
-              Ascending
-            </mat-radio-button>
-          </div>
-          <div>
-            <mat-radio-button value="desc" [disabled]="!options.orderBy">
-              Descending
-            </mat-radio-button>
-          </div>
-        </div>
-      </mat-radio-group>
-      <button mat-raised-button color="primary" (click)="addFilter()">
-        Add Filter
-      </button>
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="updateSubscription(); filtersDirty = false"
-        [disabled]="!filtersDirty"
-      >
-        Apply Changes
-      </button>
+          Apply Changes
+        </button>
+      </div>
     </mat-grid-tile>
   </mat-grid-list>
   <mat-grid-list
@@ -108,40 +122,58 @@
     *ngFor="let filter of filters; let i = index"
   >
     <mat-grid-tile>
-      <mat-form-field>
-        <mat-label>Field</mat-label>
-        <mat-select [(value)]="filter.field" (valueChange)="checkDirty(i)">
-          <mat-option *ngFor="let field of queryableFields" [value]="field[0]">
-            {{ field[1] }}
-          </mat-option>
-        </mat-select>
-        <mat-hint>Order the results from Firestore</mat-hint>
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Operator</mat-label>
-        <mat-select [(value)]="filter.operator" (valueChange)="checkDirty(i)">
-          <mat-option *ngFor="let operator of operators" [value]="operator[0]">
-            {{ operator[1] }}
-          </mat-option>
-        </mat-select>
-        <mat-hint>Order the results from Firestore</mat-hint>
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Value</mat-label>
-        <input matInput [(ngModel)]="filter.value" (input)="checkDirty(i)" />
-      </mat-form-field>
-      <div>
-        Result: {{ filter.field }} {{ filter.operator }}
-        {{ filter.value | json }}
+      <div class="grid-item">
+        <mat-form-field>
+          <mat-label>Field</mat-label>
+          <mat-select [(value)]="filter.field" (valueChange)="checkDirty(i)">
+            <mat-option
+              *ngFor="let field of queryableFields"
+              [value]="field[0]"
+            >
+              {{ field[1] }}
+            </mat-option>
+          </mat-select>
+          <mat-hint>Order the results from Firestore</mat-hint>
+        </mat-form-field>
       </div>
-      <div>Valid: {{ isValidFilter(filters[i]) ? "✔️" : "❌" }}</div>
-      <button
-        mat-raised-button
-        color="warn"
-        (click)="checkDirty(i); filters.splice(i, 1)"
-      >
-        Remove
-      </button>
+      <div class="grid-item">
+        <mat-form-field>
+          <mat-label>Operator</mat-label>
+          <mat-select [(value)]="filter.operator" (valueChange)="checkDirty(i)">
+            <mat-option
+              *ngFor="let operator of operators"
+              [value]="operator[0]"
+            >
+              {{ operator[1] }}
+            </mat-option>
+          </mat-select>
+          <mat-hint>Order the results from Firestore</mat-hint>
+        </mat-form-field>
+      </div>
+      <div class="grid-item">
+        <mat-form-field>
+          <mat-label>Value</mat-label>
+          <input matInput [(ngModel)]="filter.value" (input)="checkDirty(i)" />
+        </mat-form-field>
+      </div>
+      <div class="grid-item">
+        <div>
+          Result: {{ filter.field }} {{ filter.operator }}
+          {{ filter.value | json }}
+        </div>
+      </div>
+      <div class="grid-item">
+        <div>Valid: {{ isValidFilter(filters[i]) ? "✔️" : "❌" }}</div>
+      </div>
+      <div class="grid-item">
+        <button
+          mat-raised-button
+          color="warn"
+          (click)="checkDirty(i); filters.splice(i, 1)"
+        >
+          Remove
+        </button>
+      </div>
     </mat-grid-tile>
   </mat-grid-list>
   <app-navigation
