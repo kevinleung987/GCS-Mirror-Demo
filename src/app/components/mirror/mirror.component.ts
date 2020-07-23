@@ -14,23 +14,25 @@ import {
 } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import * as md5 from 'blueimp-md5';
 import { Observable, Subscription } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 
-import { queryableFields, operatorOptions } from './../../constants';
+import { operatorOptions, queryableFields } from './../../constants';
 import { ItemDocument, PrefixDocument } from './../../models/document';
 import { ConfigService } from './../../services/config.service';
 import { PathService } from './../../services/path.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
-interface Filter {
+interface IFilter {
   field: string;
   operator: firebase.firestore.WhereFilterOp;
   value: any;
 }
+
+type TableData = ItemDocument & { hash: string; state: string };
 
 @Component({
   selector: 'app-mirror',
@@ -50,9 +52,9 @@ export class MirrorComponent implements OnInit, OnChanges {
   queryableFields = [[null, 'None'], ...Object.entries(queryableFields)];
   operators = [[null, 'None'], ...Object.entries(operatorOptions)];
 
-  dataSource: MatTableDataSource<ItemDocument> = new MatTableDataSource();
+  dataSource: MatTableDataSource<TableData> = new MatTableDataSource();
   items: Subscription;
-  fullData: ItemDocument[];
+  fullData: TableData[];
   parentPrefix: Subscription;
   childRef: string;
 
@@ -68,7 +70,7 @@ export class MirrorComponent implements OnInit, OnChanges {
     filterBy: this.queryableFields[0][0],
     order: 'asc' as firebase.firestore.OrderByDirection,
   };
-  filters: Filter[] = [];
+  filters: IFilter[] = [];
   filtersDirty = false;
 
   @Input() path: string;
@@ -122,14 +124,7 @@ export class MirrorComponent implements OnInit, OnChanges {
             const hash = this.options.showChildRef
               ? md5(item.payload.doc.ref.path)
               : null;
-            const obj = { id, ...data, hash };
-            // console.log(item.type, item.payload.doc.id);
-
-            // TODO: Flag new entries/recent deletions
-            // setTimeout(() => {
-            //   obj.id = 'test'
-            //   console.log(obj);
-            // }, 3000);
+            const obj: TableData = { id, ...data, hash, state: item.type };
             result.push(obj);
             return result;
           }, [])
@@ -161,9 +156,19 @@ export class MirrorComponent implements OnInit, OnChanges {
   }
 
   updateData(): void {
-    this.dataSource.data = this.fullData.filter((i) =>
+    const newData = this.fullData.filter((i) =>
       this.options.showTombstones ? true : i.deletedTime == null
     );
+
+    newData.forEach((data) => {
+      if (!this.dataSource.data.some((d) => d.id === data.id)) {
+        data.state = 'new';
+      }
+      setTimeout(() => {
+        data.state = 'old';
+      }, 1000);
+    });
+    this.dataSource.data = newData;
   }
 
   getQueryFn(): QueryFn {
@@ -193,7 +198,7 @@ export class MirrorComponent implements OnInit, OnChanges {
     };
   }
 
-  isValidFilter(filter: Filter): boolean {
+  isValidFilter(filter: IFilter): boolean {
     if (filter.field == null || filter.operator == null) {
       return false;
     }

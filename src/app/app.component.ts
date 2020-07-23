@@ -1,13 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { MatDialog } from '@angular/material/dialog';
-import { Observable, Subscription } from 'rxjs';
 
 import { environment } from './../environments/environment';
 import { InfoComponent } from './components/info/info.component';
 import { SettingsComponent } from './components/settings/settings.component';
-import { PrefixDocument } from './models/document';
 import { PathService } from './services/path.service';
 
 @Component({
@@ -23,7 +20,6 @@ export class AppComponent implements OnInit {
     private storage: AngularFireStorage,
     public pathService: PathService,
     public dialog: MatDialog,
-    private firestore: AngularFirestore
   ) {}
 
   ngOnInit(): void {}

@@ -74,7 +74,7 @@
       </mat-form-field>
       <mat-radio-group
         [(ngModel)]="options.order"
-        (change)="filtersDirty = true;"
+        (change)="filtersDirty = true"
       >
         <div>
           <div>
@@ -128,7 +128,7 @@
       </mat-form-field>
       <mat-form-field>
         <mat-label>Value</mat-label>
-        <input matInput [(ngModel)]="filter.value" (input)="checkDirty(i)"/>
+        <input matInput [(ngModel)]="filter.value" (input)="checkDirty(i)" />
       </mat-form-field>
       <div>
         Result: {{ filter.field }} {{ filter.operator }}
@@ -138,10 +138,7 @@
       <button
         mat-raised-button
         color="warn"
-        (click)="
-          checkDirty(i);
-          filters.splice(i, 1)
-        "
+        (click)="checkDirty(i); filters.splice(i, 1)"
       >
         Remove
       </button>
@@ -208,6 +205,13 @@
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    <tr
+      mat-row
+      [ngClass]="{
+        'new-entry': row.state == 'new',
+        'modified-entry': row.state == 'modified'
+      }"
+      *matRowDef="let row; columns: displayedColumns"
+    ></tr>
   </table>
 </div>

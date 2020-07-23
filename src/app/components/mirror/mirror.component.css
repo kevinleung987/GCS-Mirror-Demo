@@ -9,3 +9,11 @@ tr.mat-header-row {
 mat-grid-tile * {
   margin-right: 16px;
 }
+
+.new-entry {
+  background-color: greenyellow;
+}
+
+.modified-entry {
+  background-color: gold;
+}
