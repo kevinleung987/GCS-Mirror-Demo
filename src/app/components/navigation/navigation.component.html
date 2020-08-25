@@ -10,7 +10,7 @@
     <ng-container matColumnDef="lastEvent">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Event</th>
       <td mat-cell *matCellDef="let element">
-        {{ element.lastEvent | date: "short" }}
+        {{ element?.lastEvent?.toDate() | date: "short" }}
       </td>
     </ng-container>
 

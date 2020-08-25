@@ -10,10 +10,14 @@ tr.mat-header-row {
   margin-right: 1em;
 }
 
-.new-entry {
+.added-entry {
   background-color: greenyellow;
 }
 
 .modified-entry {
   background-color: gold;
+}
+
+.removed-entry {
+  background-color: pink;
 }

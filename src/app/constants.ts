@@ -34,3 +34,9 @@ export const operatorOptions = {
   'array-contains-any': 'Array Contains Any',
   in: 'In',
 };
+
+export const inputTypeOptions = {
+  'string': 'String',
+  'number': 'Number',
+  'date': 'Date'
+}

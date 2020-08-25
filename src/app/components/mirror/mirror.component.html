@@ -36,13 +36,6 @@
       </div>
       <div class="grid-item">
         <div>
-          <mat-slide-toggle
-            [(ngModel)]="options.showTombstones"
-            (change)="updateData()"
-            >Tombstones
-          </mat-slide-toggle>
-        </div>
-        <div>
           <mat-slide-toggle [(ngModel)]="options.showChildRef">
             Show Child Ref
           </mat-slide-toggle>
@@ -133,7 +126,6 @@
               {{ field[1] }}
             </mat-option>
           </mat-select>
-          <mat-hint>Order the results from Firestore</mat-hint>
         </mat-form-field>
       </div>
       <div class="grid-item">
@@ -147,7 +139,22 @@
               {{ operator[1] }}
             </mat-option>
           </mat-select>
-          <mat-hint>Order the results from Firestore</mat-hint>
+        </mat-form-field>
+      </div>
+      <div class="grid-item">
+        <mat-form-field>
+          <mat-label>Input Type</mat-label>
+          <mat-select
+            [(value)]="filter.inputType"
+            (valueChange)="checkDirty(i)"
+          >
+            <mat-option
+              *ngFor="let inputType of inputTypes"
+              [value]="inputType[0]"
+            >
+              {{ inputType[1] }}
+            </mat-option>
+          </mat-select>
         </mat-form-field>
       </div>
       <div class="grid-item">
@@ -159,11 +166,16 @@
       <div class="grid-item">
         <div>
           Result: {{ filter.field }} {{ filter.operator }}
-          {{ filter.value | json }}
+          {{ getFilterValue(filter) | json }}
         </div>
       </div>
       <div class="grid-item">
-        <div>Valid: {{ isValidFilter(filters[i]) ? "✔️" : "❌" }}</div>
+        <div>Valid/Enabled: {{ isValidFilter(filters[i]) ? "✔️" : "❌" }}</div>
+      </div>
+      <div class="grid-item">
+        <mat-slide-toggle [(ngModel)]="filter.enabled">
+          Enabled
+        </mat-slide-toggle>
       </div>
       <div class="grid-item">
         <button
@@ -194,9 +206,7 @@
     <ng-container matColumnDef="size">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Size</th>
       <td mat-cell *matCellDef="let element">
-        {{
-          element.deletedTime ? null : formatBytes(element.gcsMetadata?.size)
-        }}
+        {{ formatBytes(element.gcsMetadata?.size) }}
       </td>
     </ng-container>
 
@@ -210,25 +220,19 @@
     <ng-container matColumnDef="updated">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Modified</th>
       <td mat-cell *matCellDef="let element">
-        {{ element.gcsMetadata?.updated | date: "short" }}
+        {{ element.gcsMetadata?.updated.toDate() | date: "short" }}
       </td>
     </ng-container>
 
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef>Actions</th>
       <td mat-cell *matCellDef="let element">
-        <button
-          mat-icon-button
-          color="warn"
-          [disabled]="element.deletedTime"
-          (click)="deleteFile(element.id)"
-        >
+        <button mat-icon-button color="warn" (click)="deleteFile(element.id)">
           <mat-icon>delete</mat-icon>
         </button>
         <button
           mat-icon-button
           color="primary"
-          [disabled]="element.deletedTime"
           (click)="downloadFile(element.id)"
         >
           <mat-icon>cloud_download</mat-icon>
@@ -240,8 +244,9 @@
     <tr
       mat-row
       [ngClass]="{
-        'new-entry': row.state == 'new',
-        'modified-entry': row.state == 'modified'
+        'added-entry': row.state == 'added',
+        'modified-entry': row.state == 'modified',
+        'removed-entry': row.state == 'removed'
       }"
       *matRowDef="let row; columns: displayedColumns"
     ></tr>

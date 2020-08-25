@@ -30,7 +30,7 @@ export class NavigationComponent implements OnInit, OnChanges {
   dataSource: MatTableDataSource<PrefixDocument> = new MatTableDataSource();
   prefixes: Subscription;
 
-  @Input() path: string;
+  @Input() path: string[];
   @Input() childRef: string;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
@@ -64,9 +64,7 @@ export class NavigationComponent implements OnInit, OnChanges {
                 const data = item.payload.doc.data() as PrefixDocument;
                 const id = item.payload.doc.id;
                 const hash = md5(item.payload.doc.ref.path);
-                if (data.deletedTime === null) {
-                  result.push({ id, ...data, hash });
-                }
+                result.push({ id, ...data, hash });
                 return result;
               },
               this.path.length === 0 ? [] : [{ id: '../' }]

@@ -21,14 +21,16 @@ import * as md5 from 'blueimp-md5';
 import { Observable, Subscription } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 
-import { operatorOptions, queryableFields } from './../../constants';
+import { operatorOptions, queryableFields, inputTypeOptions } from './../../constants';
 import { ItemDocument, PrefixDocument } from './../../models/document';
 import { ConfigService } from './../../services/config.service';
 import { PathService } from './../../services/path.service';
 
 interface IFilter {
+  enabled: boolean;
   field: string;
   operator: firebase.firestore.WhereFilterOp;
+  inputType: 'string' | 'number' | 'date';
   value: any;
 }
 
@@ -51,10 +53,11 @@ export class MirrorComponent implements OnInit, OnChanges {
   ];
   queryableFields = [[null, 'None'], ...Object.entries(queryableFields)];
   operators = [[null, 'None'], ...Object.entries(operatorOptions)];
+  inputTypes = [[null, 'None'], ...Object.entries(inputTypeOptions)];
 
   dataSource: MatTableDataSource<TableData> = new MatTableDataSource();
   items: Subscription;
-  fullData: TableData[];
+  fullData: TableData[] = [];
   parentPrefix: Subscription;
   childRef: string;
 
@@ -63,7 +66,6 @@ export class MirrorComponent implements OnInit, OnChanges {
   uploadProgress = null;
 
   options = {
-    showTombstones: false,
     showChildRef: true,
     limit: 100,
     orderBy: this.queryableFields[0][0],
@@ -73,7 +75,7 @@ export class MirrorComponent implements OnInit, OnChanges {
   filters: IFilter[] = [];
   filtersDirty = false;
 
-  @Input() path: string;
+  @Input() path: string[];
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   @Output() pathChange: EventEmitter<string> = new EventEmitter();
@@ -112,27 +114,30 @@ export class MirrorComponent implements OnInit, OnChanges {
       this.items.unsubscribe();
     }
     this.dataSource.data = [];
+    this.fullData = [];
     this.items = this.firestore
       .doc(this.pathService.getFirestorePath(this.path))
       .collection(this.config.items, this.getQueryFn())
-      .snapshotChanges()
-      .pipe(
-        map((snapshot) =>
-          snapshot.reduce((result, item) => {
-            const data = item.payload.doc.data() as ItemDocument;
-            const id = item.payload.doc.id;
-            const hash = this.options.showChildRef
-              ? md5(item.payload.doc.ref.path)
-              : null;
-            const obj: TableData = { id, ...data, hash, state: item.type };
-            result.push(obj);
-            return result;
-          }, [])
-        )
-      )
+      .stateChanges()
       .subscribe(
-        (data) => {
-          this.fullData = data;
+        (snapshot) => {
+          snapshot.forEach((item) => {
+            const stateType = item.payload.type;
+            const id = item.payload.doc.id;
+            if (stateType == 'added') {
+              const data = item.payload.doc.data() as ItemDocument;
+              const hash = this.options.showChildRef
+                ? md5(item.payload.doc.ref.path)
+                : null;
+              const obj: TableData = { id, ...data, hash, state: stateType };
+              this.fullData.push(obj);
+            } else if (stateType == 'modified' || stateType == 'removed') {
+              const item = this.fullData.find((d) => d.id === id);
+              if (item) {
+                item.state = stateType;
+              }
+            }
+          });
           this.updateData();
         },
         (error) => {
@@ -150,22 +155,23 @@ export class MirrorComponent implements OnInit, OnChanges {
                 .subscribe(() => window.open(url, '_blank'));
             }
           }
+          console.error(error);
           this.snackBar.open(error.toString(), null, { duration: 10000 });
         }
       );
   }
 
   updateData(): void {
-    const newData = this.fullData.filter((i) =>
-      this.options.showTombstones ? true : i.deletedTime == null
-    );
-
+    const newData = this.fullData;
     newData.forEach((data) => {
-      if (!this.dataSource.data.some((d) => d.id === data.id)) {
-        data.state = 'new';
-      }
       setTimeout(() => {
-        data.state = 'old';
+        if (data.state === 'removed') {
+          const itemIdx = this.dataSource.data.findIndex((d) => d.id === data.id);
+          this.dataSource.data.splice(itemIdx, 1);
+          this.dataSource.data = this.dataSource.data;
+        } else {
+          data.state = 'old';
+        }
       }, 1000);
     });
     this.dataSource.data = newData;
@@ -186,19 +192,33 @@ export class MirrorComponent implements OnInit, OnChanges {
             ret = ret.where(
               'gcsMetadata.' + filter.field,
               filter.operator,
-              filter.value
+              this.getFilterValue(filter)
             );
           } catch (e) {
             this.snackBar.open(e.toString(), null, { duration: 10000 });
           }
         }
-        console.log(filter);
       });
       return ret.limit(this.options.limit);
     };
   }
 
+  getFilterValue(filter: IFilter): any {
+    let value = filter.value;
+    if (filter.inputType == 'number') {
+      value = parseFloat(value);
+    } else if (filter.inputType == 'string') {
+      value = new String(value);
+    } else if (filter.inputType == 'date') {
+      value = new Date(value);
+    }
+    return value;
+  }
+
   isValidFilter(filter: IFilter): boolean {
+    if (filter.enabled === false) {
+      return false;
+    }
     if (filter.field == null || filter.operator == null) {
       return false;
     }
@@ -212,7 +232,7 @@ export class MirrorComponent implements OnInit, OnChanges {
     this.parentPrefix = (this.firestore
       .doc(this.pathService.getFirestorePath(this.path))
       .valueChanges() as Observable<PrefixDocument>).subscribe(
-      (data) => (this.childRef = data.childRef)
+      (data) => (this.childRef = data?.childRef)
     );
   }
 
@@ -228,13 +248,12 @@ export class MirrorComponent implements OnInit, OnChanges {
   }
 
   deleteFile(id: string): void {
-    // TODO: Add confirmation before deleting
-    const ref = this.storage.ref(this.path + id);
+    const ref = this.storage.ref(this.path.join('/') + id);
     ref.delete();
   }
 
   downloadFile(id: string): void {
-    const ref = this.storage.ref(this.path + id);
+    const ref = this.storage.ref(this.path.join('/') + id);
     ref.getDownloadURL().subscribe((url) => window.open(url, '_blank'));
   }
 
@@ -266,7 +285,7 @@ export class MirrorComponent implements OnInit, OnChanges {
   }
 
   addFilter(): void {
-    this.filters.push({ field: null, operator: null, value: null });
+    this.filters.push({ enabled: true, field: null, operator: null, inputType: null, value: null });
   }
 
   checkDirty(index: number): void {

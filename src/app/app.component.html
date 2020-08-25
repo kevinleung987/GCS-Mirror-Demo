@@ -14,7 +14,7 @@
 <div class="content">
   <div>
     <h1>Firestore Mirror</h1>
-    <div><b>Path</b> {{ path }}</div>
+    <div><b>Path</b> {{ path.join('/') }}</div>
     <div><b>GCS Path</b> {{ pathService.getGCSUrl(path) }}</div>
     <div><b>Firestore Path</b> {{ pathService.getFirestorePath(path) }}</div>
     <div class="mat-elevation-z8">

@@ -8,12 +8,13 @@ import { ConfigService } from './config.service';
 export class PathService {
   constructor(private config: ConfigService) {}
 
-  getGCSUrl(path: string): string {
-    return `gs://${this.config.bucket}/${path}`;
+  getGCSUrl(path: string[]): string {
+    const url = path.filter((a) => a.length > 0).join('/');
+    return `gs://${this.config.bucket}/${url}`;
   }
 
-  getFirestorePath(path: string): string {
-    const parts = path.split('/').filter((a) => a.length > 0);
+  getFirestorePath(path: string[]): string {
+    const parts = path.filter((a) => a.length > 0);
     let firestorePath = `${this.config.firestoreRoot}/`;
     parts.forEach(
       (part) => (firestorePath += `${this.config.prefixes}/${part}/`)

@@ -14,7 +14,7 @@ import { PathService } from './services/path.service';
 })
 export class AppComponent implements OnInit {
   blobPath = '';
-  path = '';
+  path: string[] = [];
 
   constructor(
     private storage: AngularFireStorage,
@@ -22,7 +22,9 @@ export class AppComponent implements OnInit {
     public dialog: MatDialog,
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.path = window.location.pathname.split('/').filter((a) => a.length > 0)
+  }
 
   openInfoDialog(): void {
     this.dialog.open(InfoComponent, {
@@ -47,12 +49,12 @@ export class AppComponent implements OnInit {
   }
 
   handlePathChange(id: string): void {
-    // TODO: Turn path into array of strings instead of delimiting with slash
     if (id === '../') {
-      const newPath = this.path.slice(0, -1).split('/').slice(0, -1).join('/');
-      this.path = newPath.length === 0 ? newPath : newPath + '/';
+      this.path.pop();
+      this.path = JSON.parse(JSON.stringify(this.path))
     } else {
-      this.path = this.path + id + '/';
+      this.path = this.path.concat([id]);
     }
+    window.history.pushState(null, null, this.path.join('/'));
   }
 }
