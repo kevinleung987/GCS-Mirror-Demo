@@ -21,7 +21,11 @@ import * as md5 from 'blueimp-md5';
 import { Observable, Subscription } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
 
-import { operatorOptions, queryableFields, inputTypeOptions } from './../../constants';
+import {
+  operatorOptions,
+  queryableFields,
+  inputTypeOptions,
+} from './../../constants';
 import { ItemDocument, PrefixDocument } from './../../models/document';
 import { ConfigService } from './../../services/config.service';
 import { PathService } from './../../services/path.service';
@@ -166,7 +170,9 @@ export class MirrorComponent implements OnInit, OnChanges {
     newData.forEach((data) => {
       setTimeout(() => {
         if (data.state === 'removed') {
-          const itemIdx = this.dataSource.data.findIndex((d) => d.id === data.id);
+          const itemIdx = this.dataSource.data.findIndex(
+            (d) => d.id === data.id
+          );
           this.dataSource.data.splice(itemIdx, 1);
           this.dataSource.data = this.dataSource.data;
         } else {
@@ -216,10 +222,11 @@ export class MirrorComponent implements OnInit, OnChanges {
   }
 
   isValidFilter(filter: IFilter): boolean {
-    if (filter.enabled === false) {
-      return false;
-    }
-    if (filter.field == null || filter.operator == null) {
+    if (
+      filter.enabled === false ||
+      filter.field == null ||
+      filter.operator == null
+    ) {
       return false;
     }
     return true;
@@ -285,7 +292,13 @@ export class MirrorComponent implements OnInit, OnChanges {
   }
 
   addFilter(): void {
-    this.filters.push({ enabled: true, field: null, operator: null, inputType: null, value: null });
+    this.filters.push({
+      enabled: true,
+      field: null,
+      operator: null,
+      inputType: null,
+      value: null,
+    });
   }
 
   checkDirty(index: number): void {

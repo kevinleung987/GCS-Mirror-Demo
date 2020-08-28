@@ -1,6 +1,6 @@
 {
   "name": "storage-mirror-firestore-demo",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -23,7 +23,6 @@
     "@angular/router": "~10.0.2",
     "blueimp-md5": "^2.16.0",
     "firebase": "^7.13.1",
-    "ngx-json-viewer": "^2.4.0",
     "rxjs": "~6.5.5",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.3"
